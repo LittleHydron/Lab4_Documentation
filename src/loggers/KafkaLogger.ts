@@ -1,31 +1,46 @@
+import { AbstractEntity } from "../../interfaces/entities/AbstractEntity";
+
 import { AbstractLogger } from "../../interfaces/loggers/AbstractLogger";
-import {Kafka, logLevel} from 'kafkajs';
+
+import {Kafka, logLevel}  from 'kafkajs';
+
 
 const KAFKA_BROKER_ADDRESS = 'localhost:9092';
 
-export function sendMessageToKafkaOnTopic(message: string, topic: string) {
-    const kafka = new Kafka({
-        brokers: [KAFKA_BROKER_ADDRESS],
-        logLevel: logLevel.ERROR
-    });
-
-    const producer = kafka.producer();
-
-    producer.connect().then(() => {
-        producer.send({
-            topic: topic,
-            messages: [
-                { value: message },
-            ],
-        }).then(() => {
-            console.log('Successfully sent message on topic ' + topic);
-        });
-    });
-};
-
 
 export class KafkaLogger implements AbstractLogger {
-    Log(entity: any): void {
-        sendMessageToKafkaOnTopic(JSON.stringify(entity), entity.constructor.name);
+    kafka_: Kafka;
+    producer_: any;
+
+    constructor(kafka: Kafka) {
+        this.kafka_ = kafka;
+        this.producer_ = kafka.producer();
+        this.producer_.connect().then(() => {
+            console.log('Connected to Kafka');
+        });
     }
+
+    Log(entity: AbstractEntity): void {
+        let topic = entity.getName();
+        console.log("Sending a message to the topic " + topic);
+        this.producer_.connect().then(()=>{
+            this.producer_.send({
+                topic: topic,
+                messages: [
+                    { value: JSON.stringify(entity) },
+                ],
+            }).then(() => {
+                console.log('Successfully sent message on topic ' + topic);
+            });
+        });
+    }
+}
+
+export function createKafkaLogger(): KafkaLogger {
+    console.log("Creating a kafka logger");
+    const kafka = new Kafka({
+        brokers: [KAFKA_BROKER_ADDRESS],
+        logLevel: logLevel.INFO,
+    });
+    return new KafkaLogger(kafka);
 }

@@ -12,6 +12,10 @@ export class RoomEntity implements RoomEntityInterface {
     static getName(): string {
         return "room";
     }
+    
+    getName(): string {
+        return "room";
+    }
 
     constructor(room: Partial<RoomEntity>) {
         Object.assign(this, room);

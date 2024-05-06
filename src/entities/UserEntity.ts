@@ -10,6 +10,10 @@ export class UserEntity implements UserEntityInterface{
     static getName(): string {
         return "user";
     }
+    
+    getName(): string {
+        return "user";
+    }
 
     constructor(user: Partial<UserEntity>) {
         Object.assign(this, user);

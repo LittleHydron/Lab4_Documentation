@@ -1,6 +1,6 @@
-import * as path from "path";
-import * as fs from "fs";
-import { parse } from "csv-parse";
+import * as path  from "path";
+import * as fs    from "fs";
+import { parse }  from "csv-parse";
 
 export function parseObjectsFromCSV <T> (name: string): Promise<T[]> {
     const csvFilePath = path.resolve(__dirname, name + "s.csv");
